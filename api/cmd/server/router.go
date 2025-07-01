@@ -6,6 +6,8 @@ import (
 	"github.com/venntry/config"
 	"github.com/venntry/internal/features/account/auth"
 	"github.com/venntry/internal/features/account/inventories"
+	"github.com/venntry/internal/features/app/products"
+	"github.com/venntry/internal/features/app/warehouses"
 	"github.com/venntry/internal/routes"
 	"github.com/venntry/pkg/cache"
 )
@@ -13,7 +15,7 @@ import (
 func ConfigureRoutes(e *echo.Echo, db *sqlx.DB, cache cache.IRedisService, cfg *config.Variables) {
 	// Health check endpoint
 	e.GET("/health", func(ctx echo.Context) error {
-		return ctx.JSON(200, map[string]string{"status": "A-OK!"})
+		return ctx.JSON(200, map[string]string{"status": "OK!"})
 	})
 
 	// Initialize auth routing components
@@ -26,33 +28,15 @@ func ConfigureRoutes(e *echo.Echo, db *sqlx.DB, cache cache.IRedisService, cfg *
 	inventoriesController := inventories.NewController(inventoriesRepo)
 	routes.InventoryRoutes(e, inventoriesController, authService)
 
-	// // Product routes
-	// productsRepo := products.NewRepository(db, cache)
-	// productsController := products.NewController(productsRepo)
-	// products.ProductRoutes(e, productsController, authService)
+	// Warehouse routes
+	warehouseValidator := warehouses.NewWarehouseValidator(db)
+	warehouseRepo := warehouses.NewWarehouseRepository(db, cache)
+	warehouseController := warehouses.NewWarehouseController(warehouseRepo, warehouseValidator)
+	routes.WarehouseRoutes(e, warehouseController, authService)
 
-	// // Warehouse routes
-	// warehousesRepo := warehouses.NewRepository(db, cache)
-	// warehousesController := warehouses.NewController(warehousesRepo)
-	// warehouses.WarehouseRoutes(e, warehousesController, authService)
-
-	// // Customer routes
-	// customersRepo := customers.NewRepository(db, cache)
-	// customersController := customers.NewController(customersRepo)
-	// customers.CustomerRoutes(e, customersController, authService)
-
-	// // Sale routes
-	// salesRepo := sales.NewRepository(db, cache)
-	// salesController := sales.NewController(salesRepo)
-	// sales.SaleRoutes(e, salesController, authService)
-
-	// // Vendor routes
-	// vendorsRepo := vendors.NewRepository(db, cache)
-	// vendorsController := vendors.NewController(vendorsRepo)
-	// vendors.VendorRoutes(e, vendorsController, authService)
-
-	// // Purchase routes
-	// purchasesRepo := purchases.NewRepository(db, cache)
-	// purchasesController := purchases.NewController(purchasesRepo)
-	// purchases.PurchaseRoutes(e, purchasesController, authService)
+	// Product routes
+	productValidator := products.NewProductValidator(db)
+	productRepo := products.NewProductRepository(db, cache)
+	productController := products.NewProductController(productRepo, productValidator)
+	routes.ProductRoutes(e, productController, authService)
 }

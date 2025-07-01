@@ -33,6 +33,7 @@ type AppError struct {
 type APIError struct {
 	Type    ErrorType `json:"type"`
 	Message string    `json:"message"`
+	Details string    `json:"details"`
 	Code    int       `json:"code"`
 }
 
@@ -41,6 +42,7 @@ func (e *AppError) ToAPIError() APIError {
 	return APIError{
 		Type:    e.Type,
 		Message: e.Message,
+		Details: e.Details,
 		Code:    e.Code,
 	}
 }

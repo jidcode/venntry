@@ -29,7 +29,7 @@ func HTTPErrorsMiddleware() echo.MiddlewareFunc {
 						Field("path", req.RequestURI),
 						Field("duration_ms", time.Since(start).Milliseconds()),
 						Field("status", resp.Status),
-						// Field("stack_trace", appErr.Stack),
+						Field("stack_trace", appErr.Stack),
 					)
 
 					// Return only the API error to the client
